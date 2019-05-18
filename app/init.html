@@ -1,0 +1,16 @@
+<script>
+
+(function () {
+    'use strict';
+
+    const auth = require('./js/auth.js');
+
+    if (auth.isLoggedIn()) {
+        window.location.href = 'main.html';
+    } else {
+        window.location.href = 'login.html';
+    }
+
+})();
+
+</script>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Groups</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="container">
+        <div class="navigation">
+            <ul id="nav-links">
+            </ul>
+
+            <div>
+                <button>Logout</button>
+            </div>
+        </div>
+        <div class="user-group">
+            <iframe name="group"></iframe>
+        </div>
+    </div>
+
+<script>
+
+(function () {
+    'use strict';
+
+    const $ = require('jquery');
+    const auth = require('./js/auth.js');
+
+    if (! auth.isLoggedIn()) {
+        window.location.href = 'login.html';
+    }
+
+    // TODO: replace mock with API call
+    function getGroups() {
+        return [
+            {
+                'name': 'Group 1',
+                'url': 'http://localhost:8080?page=home&public_id=1234&group=1',
+            },
+            {
+                'name': 'Group 2',
+                'url': 'http://localhost:8080?page=home&public_id=5678&group=2',
+            },
+            {
+                'name': 'Group 3',
+                'url': 'http://localhost:8080?page=home&group=3',
+            },
+        ];
+    }
+
+    getGroups().forEach(function (group, index) {
+        console.log(group.name);
+        const publicId = localStorage.getItem('graphjs_public_id');
+        const url = 'http://localhost:8080?' + $.param({
+            page: 'home',
+            public_id: publicId,
+            cookies: getCookie(), // trying to set cookie
+        });
+        let $li = $(`<li><a href="${url}" target="group">${group.name}</a></li>`);
+        $('#nav-links').append($li);
+
+        if (index === 0) {
+            $('iframe').attr('src', url);
+        }
+    });
+
+    function getCookie() {
+
+        const publicId = localStorage.getItem('graphjs_public_id');
+        const sessionId = localStorage.getItem('graphjs_session_id');
+        const token = localStorage.getItem('graphjs_token');
+
+        return JSON.stringify({
+            [`graphjs_${publicId.replace(/-/g, '')}_id`]: token,
+            id: sessionId,
+        });
+    }
+
+})();
+
+</script>
+</body>
+</html>

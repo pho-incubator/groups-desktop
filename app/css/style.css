@@ -1,0 +1,38 @@
+html, body {
+    height: 100%;
+}
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+.container {
+    height: 100%;
+    display: flex;
+}
+.navigation {
+    padding: 10px;
+}
+.navigation ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.user-group {
+    flex-grow: 1;
+}
+.user-group iframe {
+    height: 100%;
+    width: 100%;
+    border: none;
+}
+
+#login-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#form-invalid-message {
+    color: #cc4444;
+}

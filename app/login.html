@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body id="login-page">
+
+    <form id="login-form" method="POST" action="main.html">
+        <div>
+            <label>Domain</label>
+            <input type="url" name="domain" required value="https://gr.ps/Serra_de_Monchique/home">
+        </div>
+        <div>
+            <label>Username</label>
+            <input type="text" name="username" required value="hello_world">
+        </div>
+        <div>
+            <label>Password</label>
+            <input type="password" name="password" required value="1234567890">
+        </div>
+        <div id="form-invalid-message"></div>
+        <div>
+            <button type="submit">Login</button>
+        </div>
+    </form>
+
+<script>
+
+(function () {
+    'use strict';
+
+    var request = require('request');
+    var $ = require('jquery');
+    var auth = require('./js/auth.js');
+
+    if (auth.isLoggedIn()) {
+        window.location.href = 'main.html';
+    }
+
+    // TODO: parse public_id from groups website
+    function parsePublicId(domain) {
+        return '309E4553-AA06-4FF7-BB72-AEE98B9CEDD9';
+    }
+
+    var $loginForm = $('#login-form');
+    $loginForm.on('submit', function (ev) {
+
+        var domain = $loginForm.find('[name=domain]').val();
+        var username = $loginForm.find('[name=username]').val();
+        var password = $loginForm.find('[name=password]').val();
+
+        if (! (domain && username && password)) {
+            $('#form-invalid-message').text('Invalid form data');
+            return false;
+        }
+
+        var publicId = parsePublicId(domain);
+        var publicIdStripped = publicId.replace(/-/g, '');
+        var graphjsSubdomain = 'gj' + publicIdStripped.substring(4).toLowerCase();
+        var graphjsUrl = `https://${graphjsSubdomain}.herokuapp.com`;
+        var loginUrl = graphjsUrl + '/login';
+
+        request(loginUrl + '?' + $.param({
+            username: username,
+            password: password,
+            public_id: publicId,
+        }), {}, (err, res, body) => {
+            if (err) {
+                return console.error(err);
+            }
+            const json = JSON.parse(body);
+            if (json.success === false) {
+                alert('failed');
+                return;
+            }
+            localStorage.setItem('graphjs_token', json.id);
+            localStorage.setItem('graphjs_public_id', publicId);
+
+            const headerSetCookie = res.headers["set-cookie"];
+            const [ , id ] = headerSetCookie[0].split('=');
+            localStorage.setItem('graphjs_session_id', id);
+
+            window.location.href = 'main.html';
+        });
+
+        return false;
+    });
+})();
+
+</script>
+</body>
+</html>
